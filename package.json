@@ -1,0 +1,73 @@
+{
+  "name": "crystal-live-panel",
+  "version": "1.0.4",
+  "description": "Pokémon Crystal live status overlay for RetroArch and OBS",
+  "author": "itsVicOC and Crystal Live Panel contributors",
+  "license": "MIT",
+  "homepage": "https://github.com/itsVicOC/Crystal-Live-Panel#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/itsVicOC/Crystal-Live-Panel.git"
+  },
+  "bugs": {
+    "url": "https://github.com/itsVicOC/Crystal-Live-Panel/issues"
+  },
+  "main": "dist-electron/main/main.js",
+  "type": "module",
+  "scripts": {
+    "prepare:background": "node scripts/prepare-background.mjs",
+    "build:renderer": "vite build",
+    "build:electron": "tsc -p tsconfig.electron.json && node scripts/copy-preload.mjs",
+    "build": "npm run build:renderer && npm run build:electron",
+    "start": "npm run build && electron .",
+    "dev": "npm run start",
+    "test": "vitest run src",
+    "test:udp": "ALLOW_UDP_TEST=1 vitest run src/main/retroarch-client.test.ts",
+    "test:watch": "vitest",
+    "package:win": "npm run build && electron-builder --win nsis --x64",
+    "package:win:zip": "npm run build && electron-builder --win zip --x64",
+    "package:win:all": "npm run build && electron-builder --win nsis zip --x64"
+  },
+  "dependencies": {
+    "pngjs": "^7.0.0",
+    "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "@types/pngjs": "^6.0.5",
+    "@types/ws": "^8.18.1",
+    "electron": "^43.4.1",
+    "electron-builder": "^26.0.12",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.3",
+    "vitest": "^3.2.4"
+  },
+  "build": {
+    "appId": "com.crystallive.panel",
+    "productName": "Crystal Live Panel",
+    "directories": {
+      "output": "release"
+    },
+    "asar": true,
+    "files": [
+      "dist-electron/**/*",
+      "!dist-electron/**/*.test.js",
+      "!dist-electron/**/*.test.js.map",
+      "!dist-electron/main/preload.js",
+      "!dist-electron/main/preload.js.map",
+      "dist-renderer/**/*",
+      "LICENSE",
+      "NOTICE.md",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis",
+      "artifactName": "Crystal-Live-Panel-${version}-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true
+    }
+  }
+}

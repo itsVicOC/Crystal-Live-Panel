@@ -1,0 +1,25 @@
+node_modules/
+dist-electron/
+dist-renderer/
+release/
+
+.DS_Store
+Thumbs.db
+*.log
+.env
+.env.*
+
+# Never commit games, saves, states, or locally extracted sprites.
+*.gb
+*.gbc
+*.srm
+*.sav
+*.rtc
+*.state
+*.state[0-9]*
+sprites/
+
+# Local editor and coverage output.
+.idea/
+.vscode/
+coverage/
