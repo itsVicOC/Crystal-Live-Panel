@@ -19,9 +19,10 @@ export function createDefaultState(): OverlayState {
       x: 0,
       y: 0,
       landmark: "UNKNOWN",
-      displayLabel: "UNKNOWN",
+      displayLabel: "等待游戏位置",
       markerX: null,
-      markerY: null
+      markerY: null,
+      markerMode: "unknown"
     },
     diagnostics: [],
     rom: {

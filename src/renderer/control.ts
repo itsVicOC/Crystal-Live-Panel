@@ -1,24 +1,27 @@
 import type {
   ConnectionProbeResult,
   ConnectionSettings,
+  Diagnostic,
   OverlayState
 } from "../shared/types";
 import "./control.css";
+import overlayLayout from "../shared/overlay-layout.json";
+import { diagnosticLabel } from "../shared/zh-cn";
 
 const OBS_URL = "http://127.0.0.1:17654/overlay";
 const app = document.querySelector<HTMLDivElement>("#app")!;
 app.innerHTML = `
   <main class="shell">
     <header class="topbar">
-      <div class="brand"><div class="brand-gem"></div><div><h1>Crystal Live Panel</h1><div class="subtitle">RetroArch → OBS 实时直播状态面板</div></div></div>
-      <div id="status" class="status-pill waiting"><span class="status-dot"></span><span>等待 RetroArch</span></div>
+      <div class="brand"><div class="brand-gem"></div><div><h1>水晶直播面板</h1><div class="subtitle">游戏实时状态 · 直播画面叠加</div></div></div>
+      <div id="status" class="status-pill waiting"><span class="status-dot"></span><span>等待模拟器</span></div>
     </header>
     <div id="bridgeAlert" class="bridge-alert" hidden></div>
     <section class="grid">
       <article class="card preview-card">
         <div class="card-head"><h2>直播预览 · 1536 × 1024</h2><button id="openOverlay" class="btn">在浏览器打开</button></div>
-        <div id="preview" class="preview-stage"><iframe src="/overlay" title="OBS overlay preview"></iframe></div>
-        <div class="preview-note">透明区域由 OBS 下层的 RetroArch 捕获源填充；请保持游戏画面原比例居中。</div>
+        <div id="preview" class="preview-stage"><iframe src="/overlay" title="直播叠加层预览"></iframe></div>
+        <div class="preview-note">透明区域由 OBS 下层的游戏捕获源填充。游戏源位置：横坐标 ${overlayLayout.game.x}、纵坐标 ${overlayLayout.game.y}；尺寸：${overlayLayout.game.width} × ${overlayLayout.game.height}（10:9）。</div>
       </article>
       <article class="card">
         <div class="card-head"><h2>OBS 浏览器源</h2></div>
@@ -28,17 +31,17 @@ app.innerHTML = `
         </div>
       </article>
       <article class="card">
-        <div class="card-head"><h2>ROM 与连接诊断</h2></div>
+        <div class="card-head"><h2>游戏文件与连接诊断</h2></div>
         <div class="card-body">
           <div id="romBox" class="rom-box"></div>
-          <div class="actions"><button id="selectRom" class="btn primary">选择 / 重新选择 ROM</button></div>
+          <div class="actions"><button id="selectRom" class="btn primary">选择 / 重新选择游戏文件</button></div>
           <div class="connection-form">
             <label>RetroArch 地址<input id="retroArchHost" value="127.0.0.1" spellcheck="false"></label>
             <label>端口<input id="retroArchPort" type="number" min="1" max="65535" value="55355"></label>
             <button id="testConnection" class="btn">保存并测试连接</button>
           </div>
           <div id="probeResult" class="diag-list"></div>
-          <div class="help"><b>RetroArch 设置：</b>Settings → Network → Network Commands 开启并重启 RetroArch。应用只会发送 VERSION、GET_STATUS 和 READ_CORE_RAM。</div>
+          <div class="help"><b>RetroArch 设置：</b>在“设置 → 网络”中启用“网络命令”，保存配置后重启模拟器。应用只读取游戏状态和数据。</div>
           <div id="diagnostics" class="diag-list" style="margin-top:14px"></div>
         </div>
       </article>
@@ -68,7 +71,7 @@ function escapeHtml(value: unknown): string {
 
 function requireBridge() {
   if (window.crystalPanel) return window.crystalPanel;
-  const message = "Electron 页面桥接加载失败。请使用 1.0.1 或更新版本，并完整解压后运行；当前 ROM/复制按钮无法调用主进程。";
+  const message = "应用组件加载失败。请使用 1.0.1 或更新版本，并完整解压后运行；当前无法选择游戏文件或复制地址。";
   bridgeAlert.hidden = false;
   bridgeAlert.textContent = message;
   throw new Error(message);
@@ -80,23 +83,25 @@ function showActionError(error: unknown): void {
 }
 
 function renderProbe(result: ConnectionProbeResult): void {
-  probeResult.innerHTML = result.diagnostics
-    .map((item) => `<div class="diag ${item.level}"><b>${escapeHtml(item.code)}</b><br>${escapeHtml(item.message)}</div>`)
-    .join("");
+  probeResult.innerHTML = diagnosticRows(result.diagnostics);
   if (result.statusRaw) {
-    probeResult.innerHTML += `<div class="diag raw"><b>GET_STATUS 原始回包</b><br><code>${escapeHtml(result.statusRaw)}</code></div>`;
+    probeResult.innerHTML += `<details class="diag raw"><summary>查看连接原始响应</summary><code>${escapeHtml(result.statusRaw)}</code></details>`;
   }
 }
 
+function diagnosticRows(items: Diagnostic[]): string {
+  return items.map((item) => `<div class="diag ${item.level}"><b title="诊断编号：${escapeHtml(item.code)}">${escapeHtml(diagnosticLabel(item.code))}</b><br>${escapeHtml(item.message)}</div>`).join("");
+}
+
 function render(state: OverlayState): void {
-  const labels = { online: "RetroArch 已连接", paused: "RetroArch 已暂停", offline: "RetroArch 离线", waiting: "等待游戏内容" };
+  const labels = { online: "模拟器已连接", paused: "游戏已暂停", offline: "模拟器已离线", waiting: "等待游戏内容" };
   statusElement.className = `status-pill ${state.connection.status}`;
   statusElement.lastElementChild!.textContent = labels[state.connection.status];
   romBox.innerHTML = state.rom.configured
-    ? `<div class="rom-title">${state.rom.supported ? "✓" : "✕"} ${escapeHtml(state.rom.title ?? "未知 ROM")}</div><div class="rom-meta">CRC32 ${escapeHtml(state.rom.crc32 ?? "—")}<br>Sprites ${state.rom.spritesReady ? "ready" : "not ready"}</div>`
-    : `<div class="rom-title">尚未选择 ROM</div><div class="rom-meta">请选择 CRC32 9AB996C9 的附件 ROM</div>`;
+    ? `<div class="rom-title">${state.rom.supported ? "✓ 已识别《宝可梦 水晶》" : "✕ 游戏文件不受支持"}</div><div class="rom-meta">文件校验码：${escapeHtml(state.rom.crc32 ?? "—")}<br>精灵素材：${state.rom.spritesReady ? "已就绪" : "尚未就绪"}</div>`
+    : `<div class="rom-title">尚未选择游戏文件</div><div class="rom-meta">请选择受支持的《宝可梦 水晶》游戏文件（校验码 9AB996C9）</div>`;
   diagnostics.innerHTML = state.diagnostics.length
-    ? state.diagnostics.map((item) => `<div class="diag ${item.level}"><b>${escapeHtml(item.code)}</b><br>${escapeHtml(item.message)}</div>`).join("")
+    ? diagnosticRows(state.diagnostics)
     : `<div class="diag">连接后将在这里显示字段一致性检查。</div>`;
 }
 
@@ -157,7 +162,7 @@ testConnectionButton.addEventListener("click", async () => {
   try {
     testConnectionButton.disabled = true;
     testConnectionButton.textContent = "正在测试…";
-    probeResult.innerHTML = `<div class="diag">正在依次测试 VERSION、GET_STATUS 和 READ_CORE_RAM…</div>`;
+    probeResult.innerHTML = `<div class="diag">正在检查模拟器连接、游戏状态和数据读取…</div>`;
     const settings: ConnectionSettings = {
       host: hostInput.value.trim(),
       port: Number(portInput.value)
@@ -165,7 +170,7 @@ testConnectionButton.addEventListener("click", async () => {
     renderProbe(await requireBridge().testConnection(settings));
   } catch (error) {
     showActionError(error);
-    probeResult.innerHTML = `<div class="diag error"><b>TEST_FAILED</b><br>${escapeHtml(error instanceof Error ? error.message : error)}</div>`;
+    probeResult.innerHTML = `<div class="diag error"><b>连接测试失败</b><br>${escapeHtml(error instanceof Error ? error.message : error)}</div>`;
   } finally {
     testConnectionButton.disabled = false;
     testConnectionButton.textContent = "保存并测试连接";

@@ -1,0 +1,10 @@
+[
+  { "key": "boulder", "flag": 1, "frame": 1 },
+  { "key": "cascade", "flag": 2, "frame": 3 },
+  { "key": "thunder", "flag": 4, "frame": 5 },
+  { "key": "rainbow", "flag": 8, "frame": 7 },
+  { "key": "soul", "flag": 16, "frame": 9 },
+  { "key": "marsh", "flag": 32, "frame": 11 },
+  { "key": "volcano", "flag": 64, "frame": 13 },
+  { "key": "earth", "flag": 128, "frame": 15 }
+]

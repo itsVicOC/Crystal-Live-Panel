@@ -1,0 +1,6 @@
+{
+  "width": 1536,
+  "height": 1024,
+  "game": { "x": 64, "y": 112, "width": 960, "height": 864 },
+  "sidebar": { "x": 1056, "y": 112, "width": 416, "height": 864 }
+}

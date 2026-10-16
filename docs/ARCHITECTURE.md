@@ -52,7 +52,13 @@ Preload 使用 CommonJS 文件 `src/main/preload.cjs`。生产构建必须保留
 
 - `src/renderer/control.ts`：控制面板、连接设置、诊断和实时预览。
 - `src/renderer/overlay.ts`：固定 1536×1024 的 OBS 叠加层。
-- `src/renderer/overlay.css`：训练师卡、徽章、地图、队伍和状态横幅的绝对布局。
+- `src/renderer/overlay.css`：训练师卡、徽章、地图、队伍和窗口外状态提示的布局。
+- `src/shared/overlay-layout.json`：1536×1024 画布、960×864 透明游戏窗口与侧栏的位置参数。
+- `src/shared/map-data.ts`、`world-map.ts`：按地图组和地图编号解析地标，提供与区域地图一致的坐标。
+- `src/renderer/region-map.ts`：城都与关都的 SVG 区域示意图。
+- `src/shared/route-data.ts`、`route-paths.ts`：道路尺寸、出入口、区域图道路中线及地图内坐标投影；后端定位和前端道路绘制共用同一份几何数据。
+
+背景是独立的装饰素材。PNG 透明窗口和运行时 SVG 遮罩都使用共享布局配置；标记、信息卡片和文字由 renderer 绘制，不依赖图片内的地图、标签或占位格。
 
 Renderer 没有 Node.js 权限；所有系统操作通过 `contextBridge` 的最小接口完成。
 
@@ -114,9 +120,13 @@ RetroArch 的 `READ_CORE_RAM` 通过 rcheevos 的逻辑地址空间读取。对�
 - 玩家 ID 与游戏小时：16 位大端整数。
 - 金钱：24 位大端二进制整数，上限 999,999。
 - 姓名：第二世代英文、数字和少量标点字符表。
-- 徽章：8 位位图与 popcount。
+- 徽章：城都与关都各一个 8 位位图，分别统计枚数；区域切换仅影响展示，不改变收集记录。
 - 队伍：数量 0–6，物种 1–251，等级 1–100。
-- 地图：组号、地图号和城都/关都地标归属。
+- 地图：组号、地图号、城都/关都归属及道路上的相对位置。
+
+道路尺寸与连接出入口由原始地图定义生成，维度从地图块转换为角色行走格（每块两格）。`roadPosition` 将有效的地图内坐标投影到当地道路路径，再转为区域图坐标；弯道与岔路使用分段中线。只有 47 张室外道路地图参与投影（46 条道路，10 号道路含南北两张），建筑与洞穴仍使用固定地标。
+
+`location.markerMode` 分为 `route`、`landmark`、`unknown`。前端对同一张道路地图内、距离不超过 12 个区域图单位的小幅移动应用 180 毫秒过渡；跨地图、跨区域、大幅位置变化和无标记状态不进行插值。
 
 任一关键字段为 error 时，`valid` 为 false，整帧不发布。warning（例如合法但尚未建立地标映射）不会阻止发布。
 
@@ -155,7 +165,9 @@ RetroArch 的 `READ_CORE_RAM` 通过 rcheevos 的逻辑地址空间读取。对�
     "gameTimeHours": 100,
     "gameTimeMinutes": 42,
     "badges": 173,
-    "badgeCount": 5
+    "badgeCount": 5,
+    "kantoBadges": 5,
+    "kantoBadgeCount": 2
   },
   "party": [],
   "location": {},
@@ -163,6 +175,8 @@ RetroArch 的 `READ_CORE_RAM` 通过 rcheevos 的逻辑地址空间读取。对�
   "rom": {}
 }
 ```
+
+`badges` 与 `badgeCount` 保留为城都字段，`kantoBadges` 与 `kantoBadgeCount` 为关都字段。关都字节位于逻辑偏移 `0x1858`（紧接城都的 `0x1857`），稀疏读取范围 `0x184e` 的长度为 `0x0b`，同时覆盖两地徽章。renderer 根据当前区域选择徽章栏，另将两个区域的数量相加显示 16 枚总进度。
 
 ### `GET /ws`
 

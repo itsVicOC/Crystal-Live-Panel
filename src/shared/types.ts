@@ -34,8 +34,10 @@ export interface TrainerState {
   money: number;
   gameTimeHours: number;
   gameTimeMinutes: number;
-  badges: number;
-  badgeCount: number;
+  badges: number; // Johto flags; keep the existing API field name.
+  badgeCount: number; // Johto count, independent of the current region.
+  kantoBadges: number;
+  kantoBadgeCount: number;
 }
 
 export interface PartyMember {
@@ -57,6 +59,7 @@ export interface LocationState {
   displayLabel: string;
   markerX: number | null;
   markerY: number | null;
+  markerMode: "route" | "landmark" | "unknown";
 }
 
 export interface OverlayState {
@@ -93,6 +96,7 @@ export interface RomProfile {
     gameTimeSeconds: number;
     money: number;
     johtoBadges: number;
+    kantoBadges: number;
     mapGroup: number;
     mapNumber: number;
     yCoord: number;

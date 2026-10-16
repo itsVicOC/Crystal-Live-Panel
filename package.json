@@ -1,6 +1,6 @@
 {
   "name": "crystal-live-panel",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "description": "Pokémon Crystal live status overlay for RetroArch and OBS",
   "author": "itsVicOC and Crystal Live Panel contributors",
   "license": "MIT",
@@ -16,6 +16,7 @@
   "type": "module",
   "scripts": {
     "prepare:background": "node scripts/prepare-background.mjs",
+    "prepare:badges": "node scripts/prepare-badges.mjs",
     "build:renderer": "vite build",
     "build:electron": "tsc -p tsconfig.electron.json && node scripts/copy-preload.mjs",
     "build": "npm run build:renderer && npm run build:electron",

@@ -100,7 +100,7 @@ export class StateService {
       diagnostics.push({
         code: "UDP_VERSION_OK",
         level: "ok",
-        message: `UDP 已连接：${version || "RetroArch 已响应 VERSION"}`
+        message: `模拟器已连接，版本：${version || "已响应"}`
       });
     } catch (error) {
       diagnostics.push(this.connectionDiagnostic(error, "VERSION"));
@@ -114,8 +114,8 @@ export class StateService {
         level: "ok",
         message:
           status.mode === "CONTENTLESS"
-            ? "RetroArch 已响应，但当前没有加载游戏"
-            : `游戏状态：${status.mode}；CRC32 ${status.crc32 ?? "未提供"}`
+            ? "模拟器已响应，但当前没有加载游戏"
+            : `游戏状态：${status.mode === "PLAYING" ? "正在游戏" : "已暂停"}；文件校验码：${status.crc32 ?? "未提供"}`
       });
 
       if (status.mode !== "CONTENTLESS") {
@@ -125,7 +125,7 @@ export class StateService {
           diagnostics.push({
             code: "READ_CORE_RAM_OK",
             level: "ok",
-            message: "当前 RetroArch/core 支持只读 READ_CORE_RAM"
+            message: "模拟器与当前核心支持只读游戏数据"
           });
         } catch (error) {
           diagnostics.push(this.connectionDiagnostic(error, "READ_CORE_RAM"));
@@ -167,7 +167,7 @@ export class StateService {
             {
               code: "UNSUPPORTED_ROM",
               level: "error",
-              message: `不支持此 ROM（CRC32 ${identity.crc32}）`
+              message: `不支持此游戏文件（校验码 ${identity.crc32}）`
             }
           ]
         };
@@ -192,7 +192,7 @@ export class StateService {
           {
             code: "ROM_OK",
             level: "ok",
-            message: `ROM 已识别；已提取 ${extracted}/${profile.sprites.speciesCount} 个本地图像`
+            message: `游戏文件已识别；已提取 ${extracted}/${profile.sprites.speciesCount} 个本地图像`
           },
           ...(extracted < 240
             ? [{ code: "SPRITE_EXTRACTION", level: "warning" as const, message: "部分精灵图无法提取，将显示编号占位" }]
@@ -208,7 +208,7 @@ export class StateService {
           {
             code: "ROM_READ_ERROR",
             level: "error",
-            message: error instanceof Error ? error.message : "无法读取 ROM"
+            message: error instanceof Error ? error.message : "无法读取游戏文件"
           }
         ]
       };
@@ -275,7 +275,7 @@ export class StateService {
             {
               code: "ROM_CRC_MISMATCH",
               level: "error",
-              message: `RetroArch 正在运行 CRC32 ${status.crc32}，预期 ${this.profile.crc32}`
+              message: `当前游戏文件校验码为 ${status.crc32}，所需校验码为 ${this.profile.crc32}`
             }
           ]
         };
@@ -333,13 +333,13 @@ export class StateService {
         return {
           code: "RAM_READ_TIMEOUT",
           level: "error",
-          message: `${endpoint} 已响应过状态命令，但 READ_CORE_RAM 超时；请检查 RetroArch 版本和核心的 CHEEVOS 内存支持`
+          message: `${endpoint} 已响应状态查询，但游戏数据读取超时；请检查模拟器版本和核心是否支持内存读取`
         };
       }
       return {
         code: "UDP_NO_RESPONSE",
         level: command === "VERSION" ? "warning" : "error",
-        message: `${endpoint} 未响应 ${command}；请启用 Network Commands、确认端口，并重启 RetroArch`
+        message: `${endpoint} 未响应${command === "VERSION" ? "版本" : "游戏状态"}查询；请启用“网络命令”、确认端口，并重启模拟器`
       };
     }
     if (error instanceof RetroArchRamError) {

@@ -13,7 +13,7 @@
 
 Crystal Live Panel is a Windows desktop companion that reads game state through RetroArch's local UDP network command interface. It displays trainer information, party sprites, and map position in an OBS browser source. OBS captures the game separately and combines it with the overlay through a transparent viewport.
 
-> **Version note:** the latest published release is [v1.0.4](https://github.com/itsVicOC/Crystal-Live-Panel/releases/tag/v1.0.4). The screenshots below show a local, unreleased redesign. The Simplified Chinese interface, 16 badges across both regions, moving route markers, and new layout are under development and are not included in v1.0.4. This README update does not publish a new application release.
+> **Current version: [v1.1.0](https://github.com/itsVicOC/Crystal-Live-Panel/releases/tag/v1.1.0).** This release introduces the Chinese interface, 16 badges across both regions, moving route markers, and a redesigned stream layout. When upgrading from v1.0.4, update your OBS game capture position and dimensions as described below.
 
 ## Contents
 
@@ -32,14 +32,14 @@ Crystal Live Panel is a Windows desktop companion that reads game state through 
 
 ## Preview
 
-![Unreleased overlay preview: transparent game viewport, region map, trainer card, six party slots, and badges](docs/images/overlay-preview.png)
+![Overlay preview: transparent game viewport, region map, trainer card, six party slots, and badges](docs/images/overlay-preview.png)
 
-*Development preview with sample data. The checkerboard and game-area label illustrate transparency; OBS fills this area with the game capture below the overlay. The empty party demonstrates the placeholder state. See the [preview notes](docs/images/README.md) for asset attribution.*
+*v1.1.0 preview with sample data. The checkerboard and game-area label illustrate transparency; OBS fills this area with the game capture below the overlay. The empty party demonstrates the placeholder state. See the [preview notes](docs/images/README.md) for asset attribution.*
 
 <details>
-<summary>Show the development control panel</summary>
+<summary>Show the control panel</summary>
 
-![Development control panel with overlay preview, OBS address, game file selection, and connection diagnostics](docs/images/control-preview.png)
+![Control panel with overlay preview, OBS address, game file selection, and connection diagnostics](docs/images/control-preview.png)
 
 The control panel provides game file selection, local host and port settings, connection tests, diagnostics, and an overlay preview. The screenshot uses sample trainer data.
 
@@ -47,7 +47,7 @@ The control panel provides game file selection, local host and port settings, co
 
 ## Features
 
-| Capability | Published v1.0.4 | Local development version (unreleased) |
+| Capability | v1.0.4 | v1.1.0 |
 | --- | --- | --- |
 | Trainer | Name, five-digit ID, money, and play time | Retained in redesigned information cards |
 | Party | Front sprites and levels for up to six Pokémon | Three columns × two rows, species numbers, and Chinese level labels |
@@ -58,9 +58,9 @@ The control panel provides game file selection, local host and port settings, co
 
 Both versions attempt to poll at **4 Hz** and retain the last valid data when the game is paused, the connection drops, or validation fails. The only permitted commands are `VERSION`, `GET_STATUS`, and `READ_CORE_RAM`. The application does not modify the ROM, saves, or emulator memory.
 
-Development maps are regional schematics: route markers show relative progress along a route, while towns, buildings, and caves use fixed landmarks. They are not tile maps or navigation tools. HP, status conditions, held items, and moves are not currently displayed. Other games, ROM revisions, and cores have no compatibility guarantee.
+Maps are regional schematics: route markers show relative progress along a route, while towns, buildings, and caves use fixed landmarks. They are not tile maps or navigation tools. HP, status conditions, held items, and moves are not currently displayed. Other games, ROM revisions, and cores have no compatibility guarantee.
 
-The English README documents the same application; it does not add an English UI. The unreleased redesign currently uses Simplified Chinese labels.
+The English README documents the same application; the application UI currently uses Simplified Chinese labels.
 
 ## Compatibility
 
@@ -90,11 +90,11 @@ Neither the repository nor release packages provide ROMs, saves, BIOS files, or 
 1. **Download and launch.** Open [Releases](https://github.com/itsVicOC/Crystal-Live-Panel/releases/latest), download and fully extract `Crystal-Live-Panel-<version>-x64.zip`, then run `Crystal Live Panel.exe`. An `.exe` installer is also available. End users do not need Node.js.
 2. **Enable RetroArch network commands.** Turn on `Settings → Network → Network Commands`, keep port `55355`, save the configuration, and fully restart RetroArch.
 3. **Load the game.** Open the supported ROM with TGB Dual in ordinary single-game mode, then enter playable gameplay through a new game or a loaded save.
-4. **Select the same ROM in the panel.** Click `选择 / 重新选择 ROM` (select/reselect ROM), labeled `选择 / 重新选择游戏文件` in the development version. Wait for local verification and sprite extraction.
-5. **Test the connection.** Use `127.0.0.1` and the same UDP port, then click `保存并测试连接` (save and test connection). Expect `UDP_VERSION_OK`, `GET_STATUS_OK`, and `READ_CORE_RAM_OK`. Development diagnostics use Chinese titles; hover over a title to see its code.
+4. **Select the same ROM in the panel.** Click `选择 / 重新选择游戏文件` (select/reselect game file). Wait for local verification and sprite extraction.
+5. **Test the connection.** Use `127.0.0.1` and the same UDP port, then click `保存并测试连接` (save and test connection). Expect the Chinese diagnostic titles for `UDP_VERSION_OK`, `GET_STATUS_OK`, and `READ_CORE_RAM_OK`; hover over a title to see its code.
 6. **Set up OBS.** Add the browser source and align the game capture using the [settings below](#obs-setup). Keep the application running and verify the trainer and party in the preview before streaming.
 
-Release binaries currently have no commercial code-signing certificate. If Windows flags an unknown publisher, check the download source and verify checksums when supplied in the Release. There is no automatic updater; close the old application and fully extract the new version when updating.
+Release binaries currently have no commercial code-signing certificate. If Windows flags an unknown publisher, check the download source and verify the file against the Release's `SHA256SUMS.txt`. There is no automatic updater; close the old application and fully extract the new version when updating.
 
 ## OBS setup
 
@@ -109,12 +109,12 @@ Place the **Crystal Live Panel browser source above the RetroArch capture** in t
 
 Crop the RetroArch capture to the game content, then apply the transform for your version. Coordinates are relative to the overlay's top-left corner and assume the browser source has not been scaled:
 
-| Game capture setting | Original v1.0.4 layout | Unreleased layout shown above |
+| Game capture setting | Original v1.0.4 layout | v1.1.0 layout shown above |
 | --- | --- | --- |
 | Position X / Y | `194` / `108` | `64` / `112` |
 | Width × height | `854 × 768`, the old viewport bounds | `960 × 864`, exactly `10:9` |
 
-The new viewport is six times the GBC's native `160 × 144` resolution. When using the redesign, update the capture transform and refresh the browser source. Do not apply the new coordinates to v1.0.4. For other streaming canvas sizes, group both sources and scale or move the group proportionally.
+The new viewport is six times the GBC's native `160 × 144` resolution. When upgrading to v1.1.0, update the capture transform and refresh the browser source. Do not apply the new coordinates to v1.0.4. For other streaming canvas sizes, group both sources and scale or move the group proportionally.
 
 The overlay does not capture video or audio; configure those sources in OBS. See the [user guide](docs/USER_GUIDE.md) for detailed instructions in Chinese.
 
@@ -235,7 +235,7 @@ The detailed guides below are currently written primarily in Chinese. This Engli
 | [Architecture](docs/ARCHITECTURE.md) | Processes, data flow, interfaces, and security design |
 | [Contributing](CONTRIBUTING.md) | Issues, pull requests, and contribution requirements |
 | [Security policy](SECURITY.md) | Supported versions and private vulnerability reporting |
-| [Changelog](CHANGELOG.md) | Published changes; local development changes may not yet be pushed |
+| [Changelog](CHANGELOG.md) | Notable changes in each version |
 | [Third-party notice](NOTICE.md) | Third-party game assets, trademarks, and licensing scope |
 
 ## Contributing

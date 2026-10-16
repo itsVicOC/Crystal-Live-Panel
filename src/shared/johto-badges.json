@@ -1,0 +1,10 @@
+[
+  { "key": "zephyr", "flag": 1, "frame": 0 },
+  { "key": "hive", "flag": 2, "frame": 1 },
+  { "key": "plain", "flag": 4, "frame": 2 },
+  { "key": "fog", "flag": 8, "frame": 3 },
+  { "key": "storm", "flag": 32, "frame": 5 },
+  { "key": "mineral", "flag": 16, "frame": 4 },
+  { "key": "glacier", "flag": 64, "frame": 6 },
+  { "key": "rising", "flag": 128, "frame": 7 }
+]

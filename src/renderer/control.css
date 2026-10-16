@@ -1,6 +1,6 @@
 :root {
   color: #eaf0ff;
-  font-family: Inter, "Segoe UI", "Microsoft YaHei", sans-serif;
+  font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif;
   background: #0c1022;
   font-synthesis: none;
 }
@@ -54,6 +54,7 @@ h1 { margin: 0; font-size: 25px; letter-spacing: .02em; }
 .diag.warning { border-color: #f0ba55; }
 .diag.error { border-color: #ff6685; }
 .diag.raw code { color: #c7d0f3; word-break: break-all; }
+.diag.raw summary { cursor: pointer; color: #aab4d7; }
 .help { margin-top: 14px; padding: 12px; color: #aab4d7; font-size: 12px; line-height: 1.65; background: #10162d; border-radius: 10px; }
 .help b { color: #e7ebff; }
 

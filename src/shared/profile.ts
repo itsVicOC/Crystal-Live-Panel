@@ -13,7 +13,7 @@ export const CRYSTAL_PATCHED_PROFILE: RomProfile = {
     readLength: 0x0974,
     readRanges: [
       { address: 0x147b, length: 0x004e },
-      { address: 0x184e, length: 0x000a },
+      { address: 0x184e, length: 0x000b },
       { address: 0x1cb5, length: 0x0004 },
       { address: 0x1cd7, length: 0x0118 }
     ],
@@ -25,6 +25,8 @@ export const CRYSTAL_PATCHED_PROFILE: RomProfile = {
     gameTimeSeconds: 0x14c7,
     money: 0x184e,
     johtoBadges: 0x1857,
+    // wKantoBadges immediately follows the one-byte wJohtoBadges flag array.
+    kantoBadges: 0x1858,
     mapGroup: 0x1cb5,
     mapNumber: 0x1cb6,
     yCoord: 0x1cb7,

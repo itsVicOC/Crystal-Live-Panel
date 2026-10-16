@@ -14,6 +14,8 @@ function validRam(): Buffer {
   set(profile.ram.gameTimeMinutes, 42);
   set(profile.ram.gameTimeSeconds, 10);
   set(profile.ram.money, 0x01, 0xe2, 0x40);
+  set(profile.ram.johtoBadges, 0xff);
+  set(profile.ram.kantoBadges, 0x81);
   set(profile.ram.mapGroup, 24);
   set(profile.ram.mapNumber, 1);
   set(profile.ram.partyCount, 1);
@@ -39,6 +41,8 @@ describe("RAM address modes", () => {
     );
     expect(result.mode).toBe("RETROACHIEVEMENTS_OFFSET");
     expect(result.decoded.trainer.name).toBe("RED");
+    // Sparse polling must include the byte immediately after the Johto flags.
+    expect(result.decoded.trainer).toMatchObject({ badges: 255, badgeCount: 8, kantoBadges: 129, kantoBadgeCount: 2 });
   });
 
   it("falls back to native CPU addresses when low offsets are all zero", async () => {
@@ -57,7 +61,7 @@ describe("RAM address modes", () => {
       profile
     );
     expect(result.mode).toBe("GAME_BOY_CPU");
-    expect(result.decoded.trainer).toMatchObject({ name: "RED", id: 12345, gameTimeHours: 100 });
+    expect(result.decoded.trainer).toMatchObject({ name: "RED", id: 12345, gameTimeHours: 100, kantoBadges: 129, kantoBadgeCount: 2 });
   });
 
   it("reports a distinct all-zero memory diagnostic", async () => {

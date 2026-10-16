@@ -61,9 +61,9 @@ async function bootstrap(): Promise<void> {
 
   ipcMain.handle("select-rom", async () => {
     const result = await dialog.showOpenDialog({
-      title: "选择已支持的 Pokémon Crystal ROM",
+      title: "选择受支持的《宝可梦 水晶》游戏文件",
       properties: ["openFile"],
-      filters: [{ name: "Game Boy Color ROM", extensions: ["gbc"] }]
+      filters: [{ name: "游戏文件", extensions: ["gbc"] }]
     });
     if (result.canceled || result.filePaths.length === 0) return null;
     const romPath = result.filePaths[0];
@@ -98,7 +98,7 @@ async function bootstrap(): Promise<void> {
     minWidth: 940,
     minHeight: 650,
     backgroundColor: "#111429",
-    title: "Crystal Live Panel",
+    title: "水晶直播面板",
     webPreferences: {
       preload: join(currentDirectory, "preload.cjs"),
       contextIsolation: true,
