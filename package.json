@@ -23,7 +23,7 @@
     "start": "npm run build && electron .",
     "dev": "npm run start",
     "test": "vitest run src",
-    "test:udp": "ALLOW_UDP_TEST=1 vitest run src/main/retroarch-client.test.ts",
+    "test:udp": "node scripts/test-udp.mjs",
     "test:watch": "vitest",
     "package:win": "npm run build && electron-builder --win nsis --x64 --publish never",
     "package:win:zip": "npm run build && electron-builder --win zip --x64 --publish never",

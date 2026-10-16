@@ -14,6 +14,7 @@ All notable changes to Crystal Live Panel are documented here.
 - 城都与关都使用独立 SVG 示意图，地图标记直接使用游戏原生城镇地图坐标。
 - 侧栏改为独立信息卡片，队伍以六个槽、3 列×2 行排列，并增加地图与透明度回归检查。
 - 重写中英文 README，补齐预览、兼容条件、OBS 配置与开发说明；Windows 发布流程增加 UDP 集成测试、ASAR 内容检查与 SHA-256 校验文件。
+- UDP 集成测试改用跨平台 Node.js 启动器，支持在 Windows 与 macOS/Linux 使用同一条 npm 命令。
 
 ## 1.0.4 - 2026-08-24
 
